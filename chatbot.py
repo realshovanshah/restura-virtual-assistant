@@ -2,12 +2,12 @@ import random
 import json
 
 import torch
-
 from model import NeuralNet
 from pre_processing_utils import bag_of_words, tokenize
 
-import spacy
-from spacy import displacy
+from  restura_assistant import ResturaAssistant 
+from  restura_api import ResturaApi 
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -30,34 +30,47 @@ model.eval()
 
 bot_name = "Google Assistant"
 print("Hi, I am at your service! (type 'quit' to exit)")
+# ResturaAssistant.speak("Hi, I am at your service")
 
-text = "I would like to order 5 apple and 2 Pizza"
 
-nlp = spacy.load("en_core_web_sm")
-doc = nlp(text)
-displacy.serve(doc, style="ent")
+while True:
+    # sentence = "do you use credit cards?"
+    # print('You: ')
+    # sentence = ResturaAssistant.get_audio()
+    sentence = input('You: ')
+    if sentence == "quit":
+        break
 
-# while True:
-#     # sentence = "do you use credit cards?"
-#     sentence = input("You: ")
-#     if sentence == "quit":
-#         break
+    sentence = tokenize(sentence)
+    X = bag_of_words(sentence, all_words)
+    X = X.reshape(1, X.shape[0])
+    X = torch.from_numpy(X).to(device)
 
-#     sentence = tokenize(sentence)
-#     X = bag_of_words(sentence, all_words)
-#     X = X.reshape(1, X.shape[0])
-#     X = torch.from_numpy(X).to(device)
+    output = model(X)
+    _, predicted = torch.max(output, dim=1)
 
-#     output = model(X)
-#     _, predicted = torch.max(output, dim=1)
+    tag = tags[predicted.item()]
 
-#     tag = tags[predicted.item()]
+    probs = torch.softmax(output, dim=1)
+    prob = probs[0][predicted.item()]
 
-#     probs = torch.softmax(output, dim=1)
-#     prob = probs[0][predicted.item()]
-#     if prob.item() > 0.75:
-#         for intent in intents['intents']:
-#             if tag == intent["tag"]:
-#                 print(f"{bot_name}: {random.choice(intent['responses'])}")
-#     else:
-#         print(f"{bot_name}: Could you rephrase the sentence? I am still in beta.")
+    
+
+    if prob.item() > 0.75:
+        for intent in intents['intents']:
+            if tag == intent["tag"]:
+                action = intent.get('action')
+                if action != None:
+                    if action == 'order':
+                        ResturaAssistant.executeAction([word for word in sentence if word in ResturaApi.items])
+                    else:
+                        ResturaAssistant.getData(action)
+                else:
+                    print(f"{bot_name}: {random.choice(intent['responses'])}")
+                    # ResturaAssistant.speak(random.choice(intent['responses']))
+                
+    else:
+        print(f"{bot_name}: Could you rephrase the sentence? I am still in beta.")
+
+
+

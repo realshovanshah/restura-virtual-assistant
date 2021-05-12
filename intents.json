@@ -1,6 +1,5 @@
 {
-    "intents": [
-        {
+    "intents": [{
             "tag": "greeting",
             "patterns": [
                 "Hi",
@@ -45,16 +44,62 @@
             ]
         },
         {
-            "tag": "items",
+            "tag": "category",
             "patterns": [
-                "Which items do you have?",
-                "What kinds of items are there?",
+                "Which types of item do you have?",
+                "What category of items are there?",
+                "What are your categories?",
+                "category",
+                "categories",
+                "what type",
                 "What do you sell?"
+
             ],
             "responses": [
                 "We sell coffee and tea",
                 "We have coffee and tea"
-            ]
+            ],
+            "action": "category"
+        },
+        {
+            "tag": "items",
+            "patterns": [
+                "Which items do you have?",
+                "What kinds of items are there?"
+            ],
+            "responses": [
+                "We sell coffee and tea",
+                "We have coffee and tea"
+            ],
+            "action": "item"
+        },
+        {
+            "tag": "order",
+            "patterns": [
+                "I would like to order a coke",
+                "I want to make an order",
+                "Can you take my order",
+                "order"
+            ],
+            "responses": [
+                "We sell coffee and tea",
+                "We have coffee and tea"
+            ],
+            "action": "order"
+        },
+        {
+            "tag": "my order",
+            "patterns": [
+                "Check my orders",
+                "What are my orders?",
+                "Can you list my orders so far",
+                "orders"
+            ],
+            "responses": [
+                "We sell coffee and tea",
+                "We have coffee and tea"
+            ],
+            "action": "getOrder"
         },
         {
             "tag": "payments",
